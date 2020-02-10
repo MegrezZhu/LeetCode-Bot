@@ -1,0 +1,33 @@
+{
+  "name": "leetcode-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/run.js",
+    "build": "tsc"
+  },
+  "author": "Chu Zhu",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.7.0",
+    "@types/yargs": "^15.0.3",
+    "ts-node": "^8.6.2",
+    "tslint": "^6.0.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.614.0",
+    "axios": "^0.19.2",
+    "axios-cookiejar-support": "^0.5.1",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.15",
+    "log4js": "^6.1.1",
+    "rxjs": "^6.5.4",
+    "simple-git": "^1.131.0",
+    "tough-cookie": "^3.0.1",
+    "yargs": "^15.1.0"
+  }
+}
