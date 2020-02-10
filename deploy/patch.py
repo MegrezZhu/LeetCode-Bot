@@ -29,12 +29,14 @@ try:
     os.system('./pack.sh')
     packPath = root / 'dist/lambda.zip'
 
+    print('uploading function package...', end='')
     with open(packPath, 'rb') as f:
         s3.put_object(
             Bucket=bucketName,
             Key='lambda.zip',
             Body=f
         )
+    print('done.')
 
     lm.update_function_code(
         FunctionName=config['AWS']['Lambda']['functionName'],

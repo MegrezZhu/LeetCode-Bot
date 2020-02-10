@@ -61,7 +61,7 @@ export const run = async () => {
     log.info('----------------------------------------------');
     await initialize();
 
-    const subs = await update(2);
+    const subs = await update(5);
     await syncRepo(subs);
     log.info('----------------------------------------------');
 };

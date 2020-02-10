@@ -13,24 +13,27 @@ config = yaml.load(
     Loader=yaml.FullLoader
 )
 
-print('Disabling & Removing all Generated Services & Files...')
+print('Disabling & Deleting all Generated Services & Files...')
 print('------------------------------------------------------')
 
-print('removing generated files...', end='')
+print('Deleting generated files (except SSH keys)...', end='')
 dist = root / 'dist'
 Path.mkdir(dist, exist_ok=True)
-shutil.rmtree(dist)
+shutil.rmtree(dist / 'lambda', ignore_errors=True)
+package = dist / 'lambda.zip'
+if package.exists():
+    package.unlink()
 print('done.')
 
 
-print('removing CloudWatch Event Rule...', end='')
+print('Deleting CloudWatch Event Rule...', end='')
 try:
     boto3.client('events').delete_rule(Name='LeetCode-Bot-Trigger')
 except:
     pass
 print('done.')
 
-print('removing Lambda Function...', end='')
+print('Deleting Lambda Function...', end='')
 try:
     boto3.client('lambda').delete_function(
         FunctionName=config['AWS']['Lambda']['functionName']
@@ -39,7 +42,7 @@ except:
     pass
 print('done.')
 
-print('removing IAM Policy & Role...', end='')
+print('Deleting IAM Policy & Role...', end='')
 try:
     iam = boto3.client('iam')
     roleName = 'LeetCode-Bot-Role'
@@ -57,7 +60,7 @@ except:
     pass
 print('done.')
 
-print('removing S3 Bucket...', end='')
+print('Deleting S3 Bucket...', end='')
 try:
     bucket = boto3.resource('s3').Bucket(config['AWS']['S3']['bucketName'])
     bucket.objects.all().delete()

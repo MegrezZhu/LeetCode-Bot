@@ -10,6 +10,8 @@ const createLogger = () => {
             type: 'dateFile',
             filename: './logs/log'
         };
+    } else {
+        appenders.out.layout = { type: 'basic' };
     }
 
     configure({

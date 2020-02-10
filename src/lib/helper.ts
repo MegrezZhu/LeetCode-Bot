@@ -35,11 +35,17 @@ export const conMap = async <T> (fs: (() => Promise<T>)[], concurrency: number =
     return proxy;
 };
 
-// ext name that needs to modify. TODO
+// ext name that needs to modify.
 const extDict: { [v: string]: string } = {
     'javascript': 'js',
     'mysql': 'sql',
-    'python': 'py'
+    'python': 'py',
+    'python3': 'py',
+    'csharp': 'cs',
+    'ruby': 'rb',
+    'rust': 'rs',
+    'kotlin': 'kt',
+    'bash': 'sh'
 };
 
 export const getExt = (language: string): string => {

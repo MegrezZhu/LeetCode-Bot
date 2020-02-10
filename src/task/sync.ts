@@ -34,6 +34,8 @@ export const syncRepo = async (subs: Submission[]) => {
         // clone repo
         log.info('preparing git repo...');
         await fs.rmdir(repoDir, { recursive: true });
+        await fs.mkdir(repoDir, { recursive: true }); // git clone error if not mkdir first?
+        log.info(`cloning ${config.git.remotePath} into ${repoDir}`);
         await git.clone(config.git.remotePath, repoDir);
         log.info('done.');
 

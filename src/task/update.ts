@@ -49,7 +49,6 @@ export const update = async (limit: number = 5): Promise<Submission[]> => {
         log.info(`new submissions: ${JSON.stringify(filtered.map(o => o.id))}`);
         log.info(`new accpeted submissions: ${JSON.stringify(filtered.filter(sub => sub.status === 'Accepted').map(o => o.id))}`);
 
-
         if (limit) {
             await timeout(2000); // avoid accessing APIs too frequently
         }

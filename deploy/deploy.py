@@ -4,6 +4,8 @@ from botocore.exceptions import ClientError
 from pathlib import Path
 import yaml
 import json
+from random import choice
+from string import ascii_uppercase
 
 
 root = Path(__file__).absolute().parent
@@ -18,6 +20,10 @@ bucketName = config['AWS']['S3']['bucketName']
 s3 = boto3.client('s3')
 lm = boto3.client('lambda')
 Path.mkdir(root / 'dist', exist_ok=True)
+
+newKey = False
+
+interval = 10  # in minutes
 
 
 def prepareBucket():
@@ -39,7 +45,9 @@ def prepareBucket():
     )
 
     keyPath = root / 'dist/id_rsa_git'
-    os.system(f'ssh-keygen -t rsa -b 4096 -N \'\' -f {keyPath} -C noname')
+    if not keyPath.exists():
+        os.system(f'ssh-keygen -t rsa -b 4096 -N \'\' -f {keyPath} -C noname')
+        newKey = True
     with open(keyPath, 'rb') as f:
         s3.put_object(
             Bucket=bucketName,
@@ -78,12 +86,14 @@ def prepareLambda(roleArn):
     os.system('./pack.sh')
     packPath = root / 'dist/lambda.zip'
 
+    print('     uploading function package...', end='')
     with open(packPath, 'rb') as f:
         s3.put_object(
             Bucket=bucketName,
             Key='lambda.zip',
             Body=f
         )
+    print('done.')
 
     funcArn = lm.create_function(
         FunctionName=config['AWS']['Lambda']['functionName'],
@@ -96,7 +106,7 @@ def prepareLambda(roleArn):
         },
         Description='Lambda of LeetCode-Bot',
         Timeout=60,
-        MemorySize=512,
+        MemorySize=256,
         Environment={
             'Variables': {
                 'MODE': 'AWS',
@@ -119,7 +129,7 @@ def prepareTrigger(funcArn):
 
     ruleArn = ev.put_rule(
         Name='LeetCode-Bot-Trigger',
-        ScheduleExpression='rate(300 minutes)',
+        ScheduleExpression=f'rate({interval} minutes)',
         State='ENABLED',
         Description='Automatically invoke LeetCode-Bot at a fixed rate.',
     )['RuleArn']
@@ -130,6 +140,14 @@ def prepareTrigger(funcArn):
             'Id': '1',
             'Arn': funcArn,
         }]
+    )
+
+    lm.add_permission(
+        FunctionName=config['AWS']['Lambda']['functionName'],
+        StatementId=''.join(choice(ascii_uppercase) for _ in range(12)),
+        Action='lambda:InvokeFunction',
+        Principal='events.amazonaws.com',
+        SourceArn=ruleArn
     )
 
 
@@ -144,7 +162,7 @@ try:
     roleArn = prepareIAM()
     print('done.')
 
-    print('Preparing Lambda function...', end='')
+    print('Preparing Lambda function...')
     funcArn = prepareLambda(roleArn)
     print('done.')
 
@@ -154,12 +172,14 @@ try:
 
     print('------------------------------------------------------')
 
-    print(f"Don't forget to add the generated public key as a Deploy Key of your repo!")
-    print(f'Key location: {root / "dist/id_rsa_git.pub"}')
-    print(f'Key Value:')
-    print('------------------------------------------------------')
-    print((root / 'dist/id_rsa_git.pub').read_text())
-    print('------------------------------------------------------')
+    if newKey:
+        print('New SSH key generated.')
+        print(f"Don't forget to add the generated public key as a Deploy Key of your repo!")
+        print(f'Key location: {root / "dist/id_rsa_git.pub"}')
+        print(f'Key Value:')
+        print('------------------------------------------------------')
+        print((root / 'dist/id_rsa_git.pub').read_text())
+        print('------------------------------------------------------')
 
 except ClientError as e:
     print('Error:', e)
