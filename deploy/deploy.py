@@ -95,6 +95,9 @@ def prepareLambda(roleArn):
         )
     print('done.')
 
+    leetcodeSession = config['leetcodeSession']
+    del config['leetcodeSession']
+
     funcArn = lm.create_function(
         FunctionName=config['AWS']['Lambda']['functionName'],
         Runtime='nodejs12.x',
@@ -112,7 +115,7 @@ def prepareLambda(roleArn):
                 'MODE': 'AWS',
                 'GIT_SSH_COMMAND': 'ssh -o UserKnownHostsFile=/tmp/leetcode-bot/.ssh/known_hosts -i /tmp/leetcode-bot/.ssh/id_rsa_git -o StrictHostKeyChecking=no',
                 'CONFIG': json.dumps(config),
-                'LEETCODE_SESSION': config['leetcodeSession']
+                'LEETCODE_SESSION': leetcodeSession
             }
         },
         Layers=[
