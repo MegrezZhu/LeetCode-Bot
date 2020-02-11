@@ -1,0 +1,17 @@
+{
+    "storageDir": "./.store",
+    "git": {
+        "localDir": "./.store/git",
+        "relCodeDir": ".",
+        "remotePath": "Your Git Repo Url, e.g. git@github.com:JohnDoe/LeetCode.git",
+        "username": "LeetCode-Bot",
+        "email": "<Your Email>",
+        "branch": "master"
+    },
+    "AWS": {
+        "region": "AWS Region, e.g. us-east-2",
+        "S3": {
+            "bucketName": "Unique Bucket Name, e.g. john-doe-leetcode-bot"
+        }
+    }
+}
